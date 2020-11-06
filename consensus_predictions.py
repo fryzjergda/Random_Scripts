@@ -98,6 +98,77 @@ def predict_ss(predictor, sequence):
     return ss
 
 
+def get_sensitivity():
+    # sensitivity = TP/(TP+FN)
+    
+    pass
+
+def get_PPV():
+    # PPV = TP/(TP+FP)
+    
+    pass
+    
+def get_F1():
+    # F1 = (2*sensitivity*PPV)/(sensitivity+PPV)
+
+    pass
+    
+def get_MCC():
+    # MCC = (TP*TN - FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+    
+    pass
+    
+def get_confusion(predicted_pairs):
+    # TP, FP, TN, FN
+    
+    native_pairs = input_rna.pairs
+    
+    
+    keys = ["TP", "TN", "FP", "FN"]
+    confusion_dict = {key: None for key in keys}
+
+    confusion_dict["TP"] = len(list(set(native_pairs).intersection(predicted_pairs)))
+
+    TN = 
+
+
+    
+    print(confusion_dict)
+
+    
+    
+    pass
+    
+    
+
+def get_pair_list(ss):
+    db_list = [['(',')'],['[',']'],['<','>'],['{','}'],['A','a'],['B','b'],['C','c'],['D','d'],['E','e']]
+    allowed_characters = '()[]<>{}AaBbCcDdEe.'
+
+    stack_list =[]
+    pairs_list =[]
+
+
+    # stack-pop for all versions of brackets form the db_list    
+    for i in range(0, len(db_list)):
+        for c, s in enumerate(ss):
+            if s == db_list[i][0]:
+                stack_list.append(c)
+            elif s == db_list[i][1]:
+                if len(stack_list) == 0:
+                    sys.exit("There is no opening bracket for nt position "+str(c+1)+'-'+ss[c])
+                elif s == db_list[i][1]:
+                    pairs_list.append((stack_list.pop(), c))
+        if len(stack_list) > 0:
+            err = stack_list.pop()
+            sys.exit("There is no closing bracket for nt position "+str(err)+'-'+ss[err])
+
+    pairs_list_clean = [x for x in pairs_list if x != []]
+    
+
+    return pairs_list
+    
+
 def read_file():
     
     with open(infile) as f:
@@ -106,6 +177,8 @@ def read_file():
     input_rna = Input(name = lines[0])
     input_rna.add_seq(lines[1])
     input_rna.add_ss(lines[2])
+    input_rna.add_pairs(lines[2])
+    print(vars(input_rna))
     
     return input_rna
     
@@ -121,6 +194,9 @@ class Input:
     
     def add_ss(self, ss):
         self.ss = ss
+
+    def add_pairs(self, ss):
+        self.pairs = get_pair_list(ss)
 
 
 if __name__ == '__main__':
@@ -140,9 +216,9 @@ if __name__ == '__main__':
         predictor = predictors[i]
         print(predictor)
         ss = predict_ss(predictor, seqfile)
+        pairs = get_pair_list(ss)
+        get_confusion(pairs)        
         print(ss)
-    
-    
     
     
     
