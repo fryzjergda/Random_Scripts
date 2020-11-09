@@ -101,16 +101,23 @@ def predict_ss(predictor, sequence):
 def get_sensitivity():
     # sensitivity = TP/(TP+FN)
     
-    pass
+    S = confusion_dict["TP"]/(confusion_dict["TP"]+confusion_dict["FN"])
+    print("S",S) 
+        
+    return S
 
 def get_PPV():
     # PPV = TP/(TP+FP)
     
-    pass
+    PPV = confusion_dict["TP"]/(confusion_dict["TP"]+confusion_dict["FP"])
+    print("PPV", PPV)
+    return PPV
     
 def get_F1():
     # F1 = (2*sensitivity*PPV)/(sensitivity+PPV)
-
+    print(PPV, "kkk")
+    F1 = (2.0*sensitivity*PPV)/(sensitivity+PPV)
+    print("F1", F1)
     pass
     
 def get_MCC():
@@ -121,23 +128,48 @@ def get_MCC():
 def get_confusion(predicted_pairs):
     # TP, FP, TN, FN
     
-    native_pairs = input_rna.pairs
+    # TP - If it is pair in PDB and pair in prediction then it is TP - each pair gets two points
+    # TN - If it is dots in the PDB and dots in prediction then it is TN - number of dots each dot one point
+    # FN - If it is pair in PDB and not pair in prediction then FN - each pari gets two points
+    # FP - If it is not pair in PDB and pair in prediction then FP - each pair gets two points
     
+    native_pairs = input_rna.pairs
+    sequence_len = len(input_rna.seq)
+
+    nat =  "(((((((((....(((((((......((((((............))))..)).....))))).)).((((.(.....(((((..((....)).)))))....).)))).))))))))).."
+    pred = "(((((((((....(((((((....((..((((((......))..))))..)).....)))).))).((((.......((((((.((....))))))))......)))).))))))))).."
+    sequence_len = len(nat)
+    predicted_pairs = get_pair_list(pred)
+    native_pairs = get_pair_list(nat)
+
+    
+    only_in_native = [item for item in native_pairs if item not in predicted_pairs]
+    only_in_predicted = [item for item in predicted_pairs if item not in native_pairs]
+    
+    dots = list("."*sequence_len)
+    for i in range(0,len(native_pairs)):
+        dots[native_pairs[i][0]] = "X"
+        dots[native_pairs[i][1]] = "X"
+    for i in range(0,len(predicted_pairs)):
+        dots[predicted_pairs[i][0]] = "X"
+        dots[predicted_pairs[i][1]] = "X"
+
+    TN = "".join(dots).count(".")
     
     keys = ["TP", "TN", "FP", "FN"]
     confusion_dict = {key: None for key in keys}
 
-    confusion_dict["TP"] = len(list(set(native_pairs).intersection(predicted_pairs)))
-
-    TN = 
-
-
+    confusion_dict["TP"] = 2*len(list(set(native_pairs).intersection(predicted_pairs)))
+    confusion_dict["FN"] = 2*len(only_in_native)
+    confusion_dict["FP"] = 2*len(only_in_predicted)
+    confusion_dict["TN"] = TN
     
+
+    print("".join(dots))
+    print(sequence_len)
     print(confusion_dict)
 
-    
-    
-    pass
+    return confusion_dict    
     
     
 
@@ -217,7 +249,10 @@ if __name__ == '__main__':
         print(predictor)
         ss = predict_ss(predictor, seqfile)
         pairs = get_pair_list(ss)
-        get_confusion(pairs)        
+        confusion_dict = get_confusion(pairs)        
+        sensitivity = get_sensitivity()
+        PPV = get_PPV()
+        get_F1()
         print(ss)
     
     
