@@ -53,6 +53,8 @@ def bracket_to_pair(ss):
             err = stack_list.pop()
             raise IndexError("There is no closing bracket for nt position "+str(err)+'-'+ss[err])
 
+    pairs_list = sorted(pairs_list, key=lambda x: x[0])
+
     return pairs_list
 
 
@@ -187,7 +189,20 @@ if __name__ == '__main__':
     print("\n\nPAIR TO BREACKET \n\n")
     new_ss = pair_to_bracket(p_list)
 
-    print(p_list)
+    print(p_list, "initial pairs")
     new_p_list = bracket_to_pair(new_ss)
-    print(new_p_list)
+    print(new_p_list, "new pairs")
 
+    print(ss_1)
+    print(new_ss)
+    
+    if ss_1 == new_ss:
+        print("success!")
+    else:
+        print("you are a kupka")
+    
+    
+    if p_list == new_p_list:
+        print("i tak jestes zwyciezca")
+    else:
+        print("nadal jestes kupkom")
