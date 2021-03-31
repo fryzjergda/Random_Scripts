@@ -6,6 +6,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 import os   
 import numpy as np
+from operator import itemgetter
 
 def argument_parser():
 
@@ -52,13 +53,13 @@ def bracket_to_pair(ss):
             err = stack_list.pop()
             raise IndexError("There is no closing bracket for nt position "+str(err)+'-'+ss[err])
 
-    print(pairs_list)
     return pairs_list
 
 
 def pair_to_bracket(pairs_list):
 
-    db_list = [['(',')'],['[',']'],['<','>'],['{','}'],['A','a'],['B','b'],['C','c'],['D','d'],['E','e']]
+#    db_list = [['(',')'],['[',']'],['{','}'],['<','>'],['A','a'],['B','b'],['C','c'],['D','d'],['E','e']]
+    db_list = [['(',')'],['{','}'],['[',']'],['<','>'],['A','a'],['B','b'],['C','c'],['D','d'],['E','e']]
 #    db_list = [['(',')'],['[',']'], ['<','>'],['{','}']]
 #    db_list = [['(',')']]
     
@@ -75,43 +76,55 @@ def pair_to_bracket(pairs_list):
 
 #    print(array_list)
     
-    
     for i in range(0,len(array_list)):
-#        print("\n\nARRAY", i)
+        print("\n\nARRAY", i)
         current_arr = array_list[i]
+        print(current_arr, "before")
         c = 0
         while len(current_arr) >1 :
-#            print("\nSTEP",c)
+            print("\nSTEP",c)
             vec1 = current_arr[0]
-#            print(vec1, "vec1")
+            print(vec1, "vec1")
             
             vec2 =  current_arr[1]
-#            print(vec2, "vec2")
+            print(vec2, "vec2")
             sum_vec = vec1 + vec2
+            print(sum_vec,"sumvec")
+
             try:
-                pos1 = np.nonzero(vec1)[0][0]
-                pos2 = np.nonzero(vec1)[0][-1]
-#                print(np.nonzero(vec1))
-#                print(pos1, pos2)
+                pos1 = np.nonzero(vec2)[0][0]
+                pos2 = np.nonzero(vec2)[0][-1]
+                print(np.nonzero(vec1), "tosum")
+                print(pos1, pos2)
                 sum_pos = sum(sum_vec[pos1:pos2+1])
-                if sum_pos == 0:
-#                    print("merge")
+                print(sum_vec[pos1:pos2+1], "sumvec portion")
+                print(np.nonzero(sum_vec[pos1:pos2+1])[0], "nonzero in sumvec")
+                sumvec_frag_pos = list(np.nonzero(sum_vec[pos1:pos2+1])[0])
+                print(sumvec_frag_pos, "sumvec_frag_pos")
+                oneone = list(itemgetter(sumvec_frag_pos)(sum_vec[pos1:pos2+1]))
+                print(oneone, "oneone")
+                in_order = checkConsecutive(oneone)
+            
+            
+                if (sum_pos == 0) and (in_order == True):
+                    print("merge")
                 
                     current_arr[1] = sum_vec
                     current_arr = np.delete(current_arr, (0), axis =0) 
-#                    print(current_arr)
+                    print(current_arr, "good")
                 else:
                     print("go away")
                     array_list[i+1][c] = vec2
                     current_arr = np.delete(current_arr, (1), axis =0)
                     print(current_arr)
-                    quit()	                
-                c +=1
 #                print(array_list)
             except:
-                current_arr = np.delete(current_arr, (0), axis =0)
-        array_list[i] = current_arr 
-           
+                current_arr = np.delete(current_arr, (1), axis =0)
+            c+=1
+            
+        array_list[i] = current_arr
+        print(current_arr, "after") 
+#    quit()           
     print("\nFINAL")
     print(array_list)
 
@@ -123,6 +136,13 @@ def pair_to_bracket(pairs_list):
             list_brackets.append(positions.tolist())
     
     print(list_brackets)
+    for i in range(0, len(list_brackets)):
+        print(len(list_brackets[i]))
+    list_brackets = sorted(list_brackets, key=len, reverse = True)
+    for i in range(0, len(list_brackets)):
+        print(len(list_brackets[i]))
+
+#    quit()
     new_ss = list("."*len(ss_1))
     print(ss_1)
     print(''.join(new_ss))    
@@ -135,11 +155,18 @@ def pair_to_bracket(pairs_list):
                     new_ss[pairs_list[k][0]] = open
                     new_ss[pairs_list[k][1]] = close
     
-    print(''.join(new_ss))
+    print(''.join(new_ss), "here")
         
-    quit()
+#    quit()
     
-    pass
+    return ''.join(new_ss)
+
+def checkConsecutive(x):
+    print("ordering!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(x)
+    print(sorted(x, reverse= True) == x)
+    return sorted(x, reverse= True) == x
+
 
 
 if __name__ == '__main__':
@@ -149,9 +176,18 @@ if __name__ == '__main__':
     ss_1 = "(((<<.[[..)))>>...]]"
     ss_1 = "......(..(.((((([...(((((.........................((((((.((................{................................)).))))))..((((((((....)))))))){{{...........)))))..{{{{{{{{<................))))).)[[)((...)).]]..((((]((...........}}}}.}}}}.....}}}....((((((.......))))))......[}..........((((.((..((...(((((.......)))))))..)).))))..........{...................A..........>)).))))..............(((((.............<<))))).............(...(.((.................]((([((...............BB.(((((((........C))))))).................)).)))..........}....{.....((((((((((.a...)))..)))))))..{{)){).....((((((........A>>..))))))...........<<)(..((((.....))))...D...........]((..........bb))...................[c..}..}}..............................((((}((.(((.((((....)))).....(((((((((........))))))))))))..)).)))).a.....).>>....(((((((((.(((.........((((((d..............))))))........))).)))))))))...(.{.]......................).............(((((((.(((...(((((....)))))...))).......))))))).....(([[.......))(...(......((((((.....))))))....(((((.(((.....))).)))))..................(((.(((((}(.......).))))).)))..............................(((((((.....)))))))........{{{{{....){{{)(((((....(]].((((((.((.......)).))))))...................)...)))).).}}}......}}}}}...."
     print(ss_1)
+#    ss_1 = ".((....[..{..<.......))......]..}...(...>..)."
+#    ss_1 = "..(....[...{..<...A...B..)...(.]..}..[...>...{a....(...b...).)...].(.}..(...))."
+#    ss_1 = ".((....[..{..<.......))......]..}...(...>....[...{..<...A...B..)...(.]..}..[...>...{a....(...b...).)...].(.}..(...))..(....)."
+    
+    print(ss_1)
     print("\n\nBRACKET TO PAIR\n\n")
     p_list = bracket_to_pair(ss_1)
     #quit()
     print("\n\nPAIR TO BREACKET \n\n")
-    pair_to_bracket(p_list)
+    new_ss = pair_to_bracket(p_list)
+
+    print(p_list)
+    new_p_list = bracket_to_pair(new_ss)
+    print(new_p_list)
 
