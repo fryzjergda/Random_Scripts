@@ -6,6 +6,8 @@ import argparse
 from argparse import RawTextHelpFormatter
 import os  
 from textwrap import wrap
+import csv
+
 
 def argument_parser():
 
@@ -68,7 +70,7 @@ def group_reads(init_list):
             grouped_list.append(cluster)    
 
 
-        print(i)
+#        print(i)
     #print(grouped_list)    
     #print(init_list)
 
@@ -83,6 +85,14 @@ def group_reads(init_list):
     print(c, "output")
     print(len(grouped_list), "no_of_groups")
 
+
+#    for i in range(0, len(grouped_list)):
+#        print("group", i)
+#        for k in range(0, len(grouped_list[i])):
+#            print(grouped_list[i][k][4])
+    
+
+    return grouped_list
 #    print(grouped_list)
 #    print(init_list)
 
@@ -123,9 +133,10 @@ def check_range(main_list, grouped):
     if clust_list[0] == main_list[0] and len(main_list) == 1:
       clust_list = []
 
-    print(len(main_list),"len(main_list)")
-    print(len(main_list2),"len(main_list2)")
-    print(len(clust_list), "len(clust_list)")
+#    print(len(main_list),"len(main_list)")
+#    print(len(main_list2),"len(main_list2)")
+
+#    print(len(clust_list), "len(clust_list)")
         
     return main_list2, clust_list        
         
@@ -137,11 +148,87 @@ def write_output():
     outfile.close
 
 
+def write_groups(groups_list):
+    
+    path = "./"+name+"/"
+    for i in range(0, len(groups_list)):
+        with open(path+"group_"+str(i)+".csv", 'w', newline='') as myfile:
+            wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+            wr.writerows(groups_list[i])
 
+
+def get_reps(groups):
+    
+    reps = []
+    for i in range(0, len(groups)):
+        groups[i] = sorted(groups[i], key=lambda x: x[4], reverse = True)
+        reps.append(groups[i][0])
+
+
+    return reps    
+    
+        
+
+def change_borders(chimera):
+    
+    old_start_5 = chimera[0]
+    old_end_5 = chimera[1]
+    old_start_3 = chimera[2]
+    old_end_3 = chimera[3]
+    
+    reads = chimera[4]
+    
+    old_seq_5 = chimera[6]
+    old_seq_3 = chimera[7]
+    
+    struct = chimera[8]
+    
+    new_seq_5 = chimera[9]
+    new_seq_3 = chimera[10]
+    
+    
+    shifted = find_borders(old_seq_5, new_seq_5)
+    
+    new_start_5 = old_start_5 + shifted
+    new_end_5 = new_start_5 + len(new_seq_5) -1
+    
+    shifted = find_borders(old_seq_3, new_seq_3)
+
+    new_start_3 = old_start_3 + shifted
+    new_end_3 = new_start_3 + len(new_seq_3) -1
+    
+    struct_5 = struct.split("&")[0]
+    struct_3 = struct.split("&")[1]
+    new_chimera = [new_start_5,new_end_5,new_start_3,new_end_3,reads,new_seq_5,new_seq_3,struct_5,struct_3]    
+    
+    return(new_chimera)
+
+def find_borders(old_seq,new_seq):
+    temp_seq = old_seq
+    c = -1
+    for i in range(0,len(old_seq)):
+        if new_seq in temp_seq:
+            c +=1
+            temp_seq = temp_seq[1:]
+        else:
+            pass
+
+    return c
+    
+
+def map_to_genome(chimeras):
+
+
+    for i in range(0, len(chimeras))
+
+
+    pass
+    
+    
 if __name__ == '__main__':
     
     
-    simi_cutoff = 0.1
+    simi_cutoff = 0.5
     
     infile = argument_parser()
     
@@ -149,18 +236,28 @@ if __name__ == '__main__':
     
     print(name)
 
-    init_reads_list = read_csv_to_list()
-#    print(init_reads_list)
+    try:
+        os.mkdir(name)
+    except OSError:
+        print ("Creation of the directory %s failed" % name)
+    else:
+        print ("Successfully created the directory %s " % name)
 
+    init_reads_list = read_csv_to_list()
 
     grouped_reads_list = group_reads(init_reads_list)
 
-
-    quit()
+    write_groups(grouped_reads_list)
     
-    seq_formatted, react_formatted = get_formatted_seq_react()
+    reps_list = get_reps(grouped_reads_list)
+
+    new_reps_list = []
+    for i in range(0,len(reps_list)):
         
-    result_str = generate_fake_xml_str()
-    write_output()
+        new_rep = change_borders(reps_list[i])        
+        new_reps_list.append(new_rep)
+            
+    map_to_genome(new_reps_list)
+    
     
     
