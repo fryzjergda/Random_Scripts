@@ -219,11 +219,13 @@ def find_borders(old_seq,new_seq):
 def map_to_genome(chimera, number):
     
     print(chimera)
-    space_beg = (chimera[0]-4) * " " +"x&x"
-    space_between = (chimera[2] - chimera[1] -4) * " " +"x&x"
+    space_beg = (chimera[0]-5) * " " +"x&x "
+    space_between = (chimera[2] - chimera[1] -5) * " " +"x&x "
     space_end = (genome_len - chimera[3]) * " "
     
-    mapped_chimera = ">"+name+"_group_"+str(number)+"\n"+space_beg+chimera[5]+space_between+chimera[6]+"\n"+space_beg+chimera[7]+space_between+chimera[8]+"\n"
+    mapped_chimera = ">COMRADES_"+name+"_group_"+str(number)+"_range_"+str(chimera[0])+"-"+str(chimera[1])+"_to_"+str(chimera[2])+"-"+str(chimera[3])\
+                        +"\n"+space_beg+chimera[5]+space_between+chimera[6]+"\n>COMRADES_"+name+"_group_"+str(number)+"_range_"+str(chimera[0])+"-"\
+                        +str(chimera[1])+"_to_"+str(chimera[2])+"-"+str(chimera[3])+"_ss\n"+space_beg+chimera[7]+space_between+chimera[8]+"\n"
     
     return mapped_chimera
 
@@ -264,12 +266,12 @@ if __name__ == '__main__':
         new_rep = change_borders(reps_list[i])        
         new_reps_list.append(new_rep)
        
-    mapped_all_str = ">SARS-CoV-2_sequence\n" + genome_seq +"\n"
+    mapped_all_str = ""#">SARS-CoV-2_sequence\n" + genome_seq +"\n"
 
     for i in range(0, len(new_reps_list)):
     
         mapped = map_to_genome(new_reps_list[i], i)
-        mapped_all_str += mapped
+        mapped_all_str += ">SARS-CoV-2_sequence\n" + genome_seq +"\n" + mapped
     print(mapped_all_str)    
     
     
