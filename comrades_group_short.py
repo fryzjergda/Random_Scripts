@@ -11,7 +11,7 @@ import csv
 
 def argument_parser():
 
-    parser = argparse.ArgumentParser(description=__doc__, prog='comrades_groups', formatter_class=RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description=__doc__, prog='comrades_groups_short', formatter_class=RawTextHelpFormatter)
     parser.add_argument("-f", "--file", required=True, dest="file",
                             help="Input csv file.")
 
@@ -100,21 +100,23 @@ def check_range(main_list, grouped):
         if i == 0:
             clust_list = [main_list[0]]
     #        print(clust_list)
-        l_range_clust = range(clust_list[0][0],clust_list[0][1])
-        r_range_clust = range(clust_list[0][2],clust_list[0][3])
-        l_range_len_clust = clust_list[0][1] - clust_list[0][0]
-        r_range_len_clust = clust_list[0][3] - clust_list[0][2]
+        l_range_clust = range(clust_list[0][0],clust_list[0][3])
         
-        l_range_curr = range(main_list[i][0],main_list[i][1])
-        r_range_curr = range(main_list[i][2],main_list[i][3])
+        #r_range_clust = range(clust_list[0][2],clust_list[0][3])
+        l_range_len_clust = clust_list[0][3] - clust_list[0][0]
+        #r_range_len_clust = clust_list[0][3] - clust_list[0][2]
+        
+        l_range_curr = range(main_list[i][0],main_list[i][3])
+        
+        #r_range_curr = range(main_list[i][2],main_list[i][3])
 
 #        print(l_range_clust, r_range_clust, l_range_curr, r_range_curr)        
         
         l_common = len(set(l_range_clust).intersection(l_range_curr))
-        r_common = len(set(r_range_clust).intersection(r_range_curr))
+        #r_common = len(set(r_range_clust).intersection(r_range_curr))
 #        print(l_common, r_common, l_range_len_clust, r_range_len_clust)
         if clust_list[0] != main_list[i]:
-          if l_common/l_range_len_clust > simi_cutoff and r_common/r_range_len_clust > simi_cutoff:
+          if l_common/l_range_len_clust > simi_cutoff: # and r_common/r_range_len_clust > simi_cutoff:
 #            print(l_common/l_range_len_clust, "left")
 #            print(r_common/r_range_len_clust, "right")
 #            print("yes")
@@ -155,13 +157,14 @@ def get_reps(groups):
     reps = []
     for i in range(0, len(groups)):
         #groups[i] = sorted(groups[i], key=lambda x: x[4], reverse = True) # sorts by number of reads
-        print(groups[i])
+        print(i)
         for k in range(0, len(groups[i])):
             #print(groups[i][k])
-            groups[i][k] = change_borders(groups[i][k])
+            print(k)
+            groups[i][k] = get_len_chimera(groups[i][k]) #change_borders(groups[i][k])
             #print(groups[i][k])
         #quit len_of_chimera = 
-        groups[i] = sorted(groups[i], key=lambda x: x[9], reverse = True) # sort by lengths of chimera
+        groups[i] = sorted(groups[i], key=lambda x: x[11], reverse = True) # sort by lengths of chimera
         print(groups[i])
         reps.append(groups[i][0])
 
@@ -169,6 +172,14 @@ def get_reps(groups):
     return reps    
     
         
+def get_len_chimera(chimera):
+    start = chimera[0]            
+    end = chimera[3]
+    len_chimera = end - start +1
+    chimera.append(len_chimera)
+    print(chimera)
+    
+    return chimera
 
 def change_borders(chimera):
     
@@ -224,14 +235,15 @@ def find_borders(old_seq,new_seq):
 
 def map_to_genome(chimera, number):
     
-    print(chimera)
+    print(chimera, "lolo")
+#    quit()
     space_beg = (chimera[0]-5) * " " +"x&x "
     space_between = (chimera[2] - chimera[1] -5) * " " +"x&x "
     space_end = (genome_len - chimera[3]) * " "
     
-    mapped_chimera = ">COMRADES_"+name+"_group_"+str(number)+"_range_"+str(chimera[0])+"-"+str(chimera[1])+"_to_"+str(chimera[2])+"-"+str(chimera[3])\
-                        +"\n"+space_beg+chimera[5]+space_between+chimera[6]+"\n>COMRADES_"+name+"_group_"+str(number)+"_range_"+str(chimera[0])+"-"\
-                        +str(chimera[1])+"_to_"+str(chimera[2])+"-"+str(chimera[3])+"_ss\n"+space_beg+chimera[7]+space_between+chimera[8]+"\n\n"
+    mapped_chimera = ">COMRADES_"+name+"_group_"+str(number)+"_range_"+str(chimera[0])+"-"+str(chimera[3])\
+                        +"\n"+space_beg+chimera[6]+"\n>COMRADES_"+name+"_group_"+str(number)+"_range_"+str(chimera[0])+"-"\
+                        +str(chimera[3])+"_ss\n"+space_beg+chimera[8]+"\n\n"
     
     return mapped_chimera
 
@@ -265,7 +277,6 @@ if __name__ == '__main__':
     write_groups(grouped_reads_list)
     
     reps_list = get_reps(grouped_reads_list)
-
 
 
     #here - change borders put to get_reps, and comment the part below
