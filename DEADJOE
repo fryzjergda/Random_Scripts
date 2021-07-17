@@ -1,0 +1,57 @@
+
+*** These modified files were found in JOE when it aborted on Sat Jul 17 20:05:41 2021
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+2_
+3_
+4_
+5_
+6_
+7_
+8_
+~
+~
+~
+
+*** File '(Unnamed)'
+&
+&
+&
+&
+x&
+ 
+ 
+ 
+CCCTTGTGGTCTCCAGGCGGTCATGACCCATGGCCTGACCCGGCTTGGTC
+CCCTTGTGGTCTCCAGGCGGT
+
+*** File '(Unnamed)'
+seqs_larp1.fasta
+SARS-CoV-2.fa
+test.fa
+test.fa
+test.fa
+db2con.py
+db2con.py
+rai.ss
+rai.seq
+rai.ss
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+db2con.py
+
+*** File '* Startup Log *'
+Processing '/home/fryzjer/.joerc'...
+Processing '/home/fryzjer/.joe/ftyperc'...
+Finished processing /home/fryzjer/.joe/ftyperc
+Finished processing /home/fryzjer/.joerc
