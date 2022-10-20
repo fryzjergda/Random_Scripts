@@ -26,11 +26,11 @@ def read_fasta():
     with open(infile, 'r') as f:  # read sequence from file
 
         for line in f:
-          if line[0] !=">":
-            #print f.readline()
+          if line[0] !=">" and line[0] != "\n":
+            #print(f.readline())
             seq = line.strip().replace("U","T").replace("u","t").upper()
 
-    print(seq)
+    print("kko",seq)
     return seq
     
     

@@ -55,3 +55,101 @@ Processing '/home/fryzjer/.joerc'...
 Processing '/home/fryzjer/.joe/ftyperc'...
 Finished processing /home/fryzjer/.joe/ftyperc
 Finished processing /home/fryzjer/.joerc
+
+*** These modified files were found in JOE when it aborted on Wed Nov 24 17:08:30 2021
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+U
+U
+  U
+  U
+  G
+  C
+  U
+r
+large_helices
+#print
+
+*** File '(Unnamed)'
+\n
+ 
+ 
+\n
+ 
+\n
+\n
+flat
+helices
+print
+
+*** File '(Unnamed)'
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+rnasep.ss
+rnasep_2.ss
+rnasep_2.ss
+sec_struct_finder.py
+fake_xml_generator.py
+
+*** File '* Startup Log *'
+Processing '/home/fryzjer/.joerc'...
+Processing '/home/fryzjer/.joe/ftyperc'...
+Finished processing /home/fryzjer/.joe/ftyperc
+Finished processing /home/fryzjer/.joerc
+
+*** These modified files were found in JOE when it aborted on Wed Nov 24 17:41:50 2021
+*** JOE was aborted because the terminal closed
+
+*** These modified files were found in JOE when it aborted on Wed Nov 24 19:13:41 2021
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+U
+U
+  U
+  U
+  G
+  C
+  U
+r
+large_helices
+#print
+
+*** File '(Unnamed)'
+\n
+ 
+ 
+\n
+ 
+\n
+\n
+flat
+helices
+print
+
+*** File '(Unnamed)'
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+pocket_finder_onco.py
+rnasep.ss
+rnasep_2.ss
+rnasep_2.ss
+sec_struct_finder.py
+fake_xml_generator.py
+
+*** File '* Startup Log *'
+Processing '/home/fryzjer/.joerc'...
+Processing '/home/fryzjer/.joe/ftyperc'...
+Finished processing /home/fryzjer/.joe/ftyperc
+Finished processing /home/fryzjer/.joerc
+
+*** These modified files were found in JOE when it aborted on Thu Nov 25 19:11:01 2021
+*** JOE was aborted because the terminal closed
