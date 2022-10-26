@@ -15,7 +15,7 @@ def argument_parser():
     parser.add_argument("-a", "--algorithm", required=False, dest="algorithm", default="radiate", type=str, choices=['line','circular','radiate','naview'],
                             help="Varna drawing mode.")
     parser.add_argument("-t", "--temperature", required=False, dest="temperature", default=37, type=int,
-                        help="Folding temperature.")
+                        help="Folding temperature. [default = 37]")
 
 
 
