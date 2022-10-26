@@ -14,6 +14,9 @@ def argument_parser():
                             help="File with reactivity profile.")
     parser.add_argument("-a", "--algorithm", required=False, dest="algorithm", default="radiate", type=str, choices=['line','circular','radiate','naview'],
                             help="Varna drawing mode.")
+    parser.add_argument("-t", "--temperature", required=False, dest="temperature", default=37, type=int,
+                        help="Folding temperature.")
+
 
 
 
@@ -22,8 +25,9 @@ def argument_parser():
     input = args.input
     react = args.react
     alg = args.algorithm
+    temperature = args.temperature
     
-    return input, react, alg
+    return input, react, alg, temperature
 
 
 def read_file(input):
@@ -112,7 +116,7 @@ def draw_varna(name, sequence, structure, reactivities, outfile):
 def predict_ss():
     
     
-    cmd = "RNAfold -p -d2 --noLP --noDP --noPS < %s" % (in_file)
+    cmd = "RNAfold -p -d2 --noLP --noDP --noPS -T %s < %s" % (temperature, in_file)
     
     ss = os.popen(cmd).read().splitlines()[2].split(' ')[0]  
 
@@ -122,8 +126,9 @@ def predict_ss():
 
 def predict_ss_shape():
 
-    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=D < %s" % (rfold_react, in_file)
+    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=D -T %s < %s" % (rfold_react, temperature, in_file)
 
+    print(cmd)
     ss = os.popen(cmd).read().splitlines()[2].split(' ')[0]  
 
     return ss
@@ -155,10 +160,14 @@ if __name__ == '__main__':
 
     VARNA_path = '~/Apps/VARNAv3-93.jar'
     
-    in_file, react_file, algorithm = argument_parser()
+    in_file, react_file, algorithm, temperature = argument_parser()
 
     outname = in_file.split(".")[0]
 
+    if temperature != 37:
+        outname += "_T"+str(temperature)
+        
+        
     id, seq, ss = read_file(in_file)
 
     
