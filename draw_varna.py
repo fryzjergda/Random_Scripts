@@ -126,7 +126,9 @@ def predict_ss():
     
     
     cmd = "RNAfold -p -d2 --noLP --noDP --noPS -T %s < %s" % (temperature, in_file)
-    
+
+    print(cmd, "\n")
+        
     ss = os.popen(cmd).read().splitlines()[2].split(' ')[0]  
 
     return ss
