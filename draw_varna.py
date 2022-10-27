@@ -3,6 +3,7 @@
 
 import argparse
 import os
+import sys
 
 def argument_parser():
 
@@ -16,8 +17,12 @@ def argument_parser():
                             help="Varna drawing mode.")
     parser.add_argument("-t", "--temperature", required=False, dest="temperature", default=37, type=int,
                         help="Folding temperature. [default = 37]")
-
-
+    parser.add_argument("-sl", "--slope", required=False, dest="slope", default=1.9, type=float,
+                        help="Slope value for SHAPE guided folding. [default = 1.9]")
+    parser.add_argument("-in", "--intercept", required=False, dest="intercept", default=-0.7, type=float,
+                        help="Intercept value for SHAPE guided folding. [default = -0.7]")
+    parser.add_argument("-o", "--output", required=False, dest="output", default = "",
+                            help="Output file name. If not provided the output will be generated basing on input file name.")
 
 
     args = parser.parse_args()
@@ -26,8 +31,11 @@ def argument_parser():
     react = args.react
     alg = args.algorithm
     temperature = args.temperature
+    slope = args.slope
+    intercept = args.intercept
+    output = args.output
     
-    return input, react, alg, temperature
+    return input, react, alg, temperature, slope, intercept, output
 
 
 def read_file(input):
@@ -104,7 +112,8 @@ def draw_varna(name, sequence, structure, reactivities, outfile):
 
     cmd = 'java -cp ' + VARNA_path + ' fr.orsay.lri.varna.applications.VARNAcmd -sequenceDBN ' + sequence + \
             " -structureDBN '" + structure + "' -o " + outfile +"_"+algorithm+".png  -resolution 10.0 -title '" +name +"' -titleSize 10" + \
-            " -algorithm "+algorithm+" -colorMapMin '0.0' -colorMapMax '1.0' -colorMapStyle '" + colormap + "' -colorMap '" + reactivities + "'"
+            " -algorithm "+algorithm+" -colorMapMin '0.0' -colorMapMax '1.0' -colorMapStyle '" + colormap + "' -colorMap '" + reactivities + "'" + \
+            " -bpStyle simple"
 
     os.system(cmd)
 
@@ -126,9 +135,9 @@ def predict_ss():
 
 def predict_ss_shape():
 
-    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=D -T %s < %s" % (rfold_react, temperature, in_file)
+    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=Dm%sb%s -T %s < %s" % (rfold_react,slope, intercept, temperature, in_file)
 
-    print(cmd)
+    print(cmd, "\n")
     ss = os.popen(cmd).read().splitlines()[2].split(' ')[0]  
 
     return ss
@@ -156,17 +165,35 @@ def get_rfold_react():
     return rfold_react_file
 
 
+
+def get_outname(outname):
+    
+    if outname == "":
+        outname = in_file.split(".")[0]
+
+    if temperature != 37:
+        outname += "_T"+str(temperature)
+
+    if slope != 1.9:
+        outname += "_sl"+str(slope)
+
+    if intercept != -0.7:
+        outname += "_in"+str(intercept)
+
+    return outname
+    
+    
+
 if __name__ == '__main__':
 
     VARNA_path = '~/Apps/VARNAv3-93.jar'
     
-    in_file, react_file, algorithm, temperature = argument_parser()
+    in_file, react_file, algorithm, temperature, slope, intercept, outfile = argument_parser()
 
-    outname = in_file.split(".")[0]
+    outname = get_outname(outfile)
 
-    if temperature != 37:
-        outname += "_T"+str(temperature)
-        
+    with open(outname+'.log', 'w') as f:
+        f.write("draw_varna.py "+'\n'.join(sys.argv[1:]).replace('\n',' ')+"\n")
         
     id, seq, ss = read_file(in_file)
 
@@ -186,10 +213,12 @@ if __name__ == '__main__':
         quit()
 
     print("Title:\n"+ id+"\n")
+    print("Outfile:\n" + outname+ "\n")
     print("Sequence:\n" +seq+"\n")
     
     if ss == "":
         print("Structure:\nNot provided\n")
+        print("Predicting structure.\n")
     else:
         print("Structure:\n" +ss+"\n")
     
@@ -201,7 +230,6 @@ if __name__ == '__main__':
         ss = predict_ss_shape()
         print("Predicted structure with SHAPE reactivities:\n" +ss+"\n")
         
-        
     draw_varna(id, seq, ss, react_profile, outname)    
 
-    
+
