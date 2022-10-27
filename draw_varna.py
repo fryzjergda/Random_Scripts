@@ -59,7 +59,7 @@ def read_file(input):
         if line[0] == ">":
             id = line.replace(">","")
         elif any(l in line.upper() for l in nts):
-            sequence = line.upper()
+            sequence = line.upper().replace("T","U")
         elif any(c in line for c in dbs):
             structure = line.split(" ")[0]
         
