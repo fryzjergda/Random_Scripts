@@ -27,6 +27,9 @@ def argument_parser():
                             help="Output file name. If not provided the output will be generated basing on input file name.")
     parser.add_argument("-em", "--energymodel", required=False, dest="param", default="t", type=str, choices=['t','a'],
                             help="Energy model to use with RNAfold [t = Turner 2004, a = Andronescu 2007]")
+    parser.add_argument("-p", "--predictor", required=False, dest="predictor", default="rf", type=str, choices=['rf','sk'],
+                            help="Prediction method [rf = RNAfold, sk = ShapeKnots]")
+
 
 
 
@@ -41,8 +44,9 @@ def argument_parser():
     intercept = args.intercept
     output = args.output
     param = args.param
+    predictor = args.predictor
     
-    return input, react, alg, temperature, slope, intercept, output, param
+    return input, react, alg, temperature, slope, intercept, output, param, predictor
 
 
 def read_file(input):
@@ -222,6 +226,27 @@ def predict_ss_shape():
     return ss
 
 
+def predict_ss_sk():
+
+    
+
+    pass
+
+    
+def predict_ss_sk_shape():
+
+    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -sh " + rfold_react
+    os.popen(cmd)
+
+    cmd = "ct2dot tmp.ct 1 " + result_shapeknots_dot
+    os.popen(cmd)
+
+    cmd = "rm dot.ps rna.ps tmp.ct"
+    os.popen(cmd)
+
+    
+    pass
+
 
 def get_rfold_react():
     
@@ -268,6 +293,11 @@ def get_outname(outname):
 
     if intercept != -0.7:
         outname += "_in"+str(intercept)
+    
+    if ss == "" and predictor == "sk":
+        outname += "_SK"
+    elif ss == "" and predictor == "rf":
+        outname += "_Rfold"
 
     if param == "a":
         outname += "_AndronescuEM"
@@ -284,12 +314,16 @@ if __name__ == '__main__':
     SCRIPT_path =os.path.abspath(__file__) 
     PARAM_path = SCRIPT_path.replace(".py", "_functions/")
     
-    in_file, react_file, algorithm, temperature, slope, intercept, outfile, param = argument_parser()
+    in_file, react_file, algorithm, temperature, slope, intercept, outfile, param, predictor = argument_parser()
 
     
     if param == "a":
         cmd = "cp "+ PARAM_path+"and.param ."
         os.system(cmd)
+
+    id, seq, ss = read_file(in_file)
+    
+        
 
 
     outname = get_outname(outfile)
@@ -297,7 +331,6 @@ if __name__ == '__main__':
     with open(outname+'.log', 'w') as f:
         f.write("draw_varna.py "+'\n'.join(sys.argv[1:]).replace('\n',' ')+"\n")
         
-    id, seq, ss = read_file(in_file)
 
     
     
@@ -309,6 +342,7 @@ if __name__ == '__main__':
     
     if react_profile != "":
         rfold_react = get_rfold_react()
+    print(rfold_react)
 
     if react_file and len(react_profile.split(";")) != len(seq):
         print("There is a different number of reactivity values than nucleotides in the sequence. Aborting.")
@@ -318,19 +352,25 @@ if __name__ == '__main__':
     print("Outfile:\n" + outname+ "\n")
     print("Sequence:\n" +seq+"\n")
     
+    pred_used = ""
+    if predictor == "sk":
+        pred_used = " with Shapeknots"
+    elif predictor == "rf":
+        pred_used = " with RNAfold"
+        
     if ss == "":
         print("Structure:\nNot provided\n")
-        print("Predicting structure.\n")
+        print("Predicting structure"+pred_used+".\n")
     else:
-        print("Structure:\n" +ss+"\n")
+        print("Structure"+pred_used+":\n" +ss+"\n")
     
     
     if ss == "" and react_profile == "":
         ss = predict_ss()
-        print("Predicted structure:\n" +ss+"\n")
+        print("Predicted structure:"+pred_used+"\n" +ss+"\n")
     elif ss == "" and react_profile != "":
         ss = predict_ss_shape()
-        print("Predicted structure with SHAPE reactivities:\n" +ss+"\n")
+        print("Predicted structure with SHAPE reactivities"+pred_used+":\n" +ss+"\n")
         
     draw_varna(id, seq, ss, react_profile, outname)    
 
