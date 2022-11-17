@@ -5,6 +5,8 @@ import argparse
 import os
 import sys
 
+import draw_varna_functions.RFparam as RFparam
+
 def argument_parser():
 
     parser = argparse.ArgumentParser(description=__doc__, prog='draw_varna', formatter_class=argparse.RawTextHelpFormatter)
@@ -23,6 +25,10 @@ def argument_parser():
                         help="Intercept value for SHAPE guided folding. [default = -0.7]")
     parser.add_argument("-o", "--output", required=False, dest="output", default = "",
                             help="Output file name. If not provided the output will be generated basing on input file name.")
+    parser.add_argument("-em", "--energymodel", required=False, dest="param", default="t", type=str, choices=['t','a'],
+                            help="Energy model to use with RNAfold [t = Turner 2004, a = Andronescu 2007]")
+
+
 
 
     args = parser.parse_args()
@@ -34,8 +40,9 @@ def argument_parser():
     slope = args.slope
     intercept = args.intercept
     output = args.output
+    param = args.param
     
-    return input, react, alg, temperature, slope, intercept, output
+    return input, react, alg, temperature, slope, intercept, output, param
 
 
 def read_file(input):
@@ -163,8 +170,14 @@ def predict_ss():
     else:
         input = "temp.fa"
 
+    if param == "a":
+        em = "-P and.param "
+    else:
+        em = ""
+
     
-    cmd = "RNAfold -p -d2 --noLP --noDP --noPS -T %s < %s" % (temperature, input)
+    
+    cmd = "RNAfold -p -d2 --noLP --noDP --noPS -T %s %s < %s" % (temperature, em, input)
 
     print(cmd, "\n")
         
@@ -190,8 +203,13 @@ def predict_ss_shape():
         input = in_file
     else:
         input = "temp.fa"
+    
+    if param == "a":
+        em = "-P and.param "
+    else:
+        em = ""
         
-    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=Dm%sb%s -T %s < %s" % (rfold_react,slope, intercept, temperature, input)
+    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=Dm%sb%s -T %s %s < %s" % (rfold_react,slope, intercept, temperature, em, input)
 
     print(cmd, "\n")
     ss = os.popen(cmd).read().splitlines()[2].split(' ')[0]  
@@ -234,7 +252,7 @@ def write_out(id, seq, ss, outname):
     out_file.write(text)
     out_file.close()
 
-    print("Output file :" + outname+"_DVout.db\n")    
+    print("Output file: " + outname+"_DVout.db\n")    
 
 
 def get_outname(outname):
@@ -251,6 +269,9 @@ def get_outname(outname):
     if intercept != -0.7:
         outname += "_in"+str(intercept)
 
+    if param == "a":
+        outname += "_AndronescuEM"
+
     return outname
     
     
@@ -258,8 +279,18 @@ def get_outname(outname):
 if __name__ == '__main__':
 
     VARNA_path = '~/Apps/VARNAv3-93.jar'
+#    PARAM_path = 
     
-    in_file, react_file, algorithm, temperature, slope, intercept, outfile = argument_parser()
+    SCRIPT_path =os.path.abspath(__file__) 
+    PARAM_path = SCRIPT_path.replace(".py", "_functions/")
+    
+    in_file, react_file, algorithm, temperature, slope, intercept, outfile, param = argument_parser()
+
+    
+    if param == "a":
+        cmd = "cp "+ PARAM_path+"and.param ."
+        os.system(cmd)
+
 
     outname = get_outname(outfile)
 
@@ -305,5 +336,8 @@ if __name__ == '__main__':
 
 
     write_out(id, seq, ss, outname)
-
+    
+    if param == "a":
+        cmd = "rm and.param"
+        os.system(cmd)
 
