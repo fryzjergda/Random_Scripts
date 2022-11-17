@@ -228,24 +228,40 @@ def predict_ss_shape():
 
 def predict_ss_sk():
 
-    
+    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -ph 10" 
+    os.system(cmd)
 
-    pass
+    cmd = "ct2dot tmp.ct 1 tmp.sk" 
+    os.system(cmd)
+
+    with open("tmp.sk") as file:
+        lines = file.readlines()
+        ss = lines[2]
+
+    cmd = "rm tmp.ct"
+    os.popen(cmd)
+
+
+    return ss
 
     
 def predict_ss_sk_shape():
 
-    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -sh " + rfold_react
-    os.popen(cmd)
+    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -ph 10 -sh " + rfold_react 
+    os.system(cmd)
 
-    cmd = "ct2dot tmp.ct 1 " + result_shapeknots_dot
-    os.popen(cmd)
+    cmd = "ct2dot tmp.ct 1 tmp.sk" 
+    os.system(cmd)
+    
+    with open("tmp.sk") as file:
+        lines = file.readlines()
+        ss = lines[2]
 
-    cmd = "rm dot.ps rna.ps tmp.ct"
+    cmd = "rm tmp.ct"
     os.popen(cmd)
 
     
-    pass
+    return ss
 
 
 def get_rfold_react():
@@ -293,11 +309,14 @@ def get_outname(outname):
 
     if intercept != -0.7:
         outname += "_in"+str(intercept)
-    
+
     if ss == "" and predictor == "sk":
         outname += "_SK"
     elif ss == "" and predictor == "rf":
         outname += "_Rfold"
+
+    if react_profile != "":
+        outname += "_shape"
 
     if param == "a":
         outname += "_AndronescuEM"
@@ -325,6 +344,13 @@ if __name__ == '__main__':
     
         
 
+    react_profile = ""
+
+    if react_file:
+
+        react_profile = read_reactivity(react_file)
+
+
 
     outname = get_outname(outfile)
 
@@ -334,15 +360,15 @@ if __name__ == '__main__':
 
     
     
-    react_profile = ""
+#    react_profile = ""
     
-    if react_file:
+#    if react_file:
     
-        react_profile = read_reactivity(react_file)
+#        react_profile = read_reactivity(react_file)
+    
     
     if react_profile != "":
         rfold_react = get_rfold_react()
-    print(rfold_react)
 
     if react_file and len(react_profile.split(";")) != len(seq):
         print("There is a different number of reactivity values than nucleotides in the sequence. Aborting.")
@@ -366,10 +392,21 @@ if __name__ == '__main__':
     
     
     if ss == "" and react_profile == "":
-        ss = predict_ss()
+        
+        if predictor == "rf":
+            ss = predict_ss()
+        elif predictor == "sk":
+        
+            ss = predict_ss_sk()
         print("Predicted structure:"+pred_used+"\n" +ss+"\n")
+        
     elif ss == "" and react_profile != "":
-        ss = predict_ss_shape()
+        
+        if predictor == "rf":
+            ss = predict_ss_shape()
+        elif predictor == "sk":
+            ss = predict_ss_sk_shape()
+
         print("Predicted structure with SHAPE reactivities"+pred_used+":\n" +ss+"\n")
         
     draw_varna(id, seq, ss, react_profile, outname)    
