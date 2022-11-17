@@ -153,3 +153,62 @@ Finished processing /home/fryzjer/.joerc
 
 *** These modified files were found in JOE when it aborted on Thu Nov 25 19:11:01 2021
 *** JOE was aborted because the terminal closed
+
+*** These modified files were found in JOE when it aborted on Thu Nov 17 14:57:05 2022
+*** JOE was aborted by UNIX signal 1
+
+*** File '(Unnamed)'
+P
+\n>
+U
+.
+unfolded_code
+G
+C
+U
+A
+
+
+*** File '(Unnamed)'
+a
+\n
+UUUUGGUUUU
+ 
+ 
+UCAACGUU
+GGGAGGGAGC
+UUAAAUGGGG
+GGUUAAGAACGU
+CAUGGCUUCA
+
+*** File '(Unnamed)'
+NC_Bulbul_short.seq
+MW_Avian.seq
+MW_Avian_short.seq
+draw_stable_fragments.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+draw_varna.py
+
+*** File '* Startup Log *'
+Processing '/home/fryzjer/.joerc'...
+Processing '/home/fryzjer/.joe/ftyperc'...
+Finished processing /home/fryzjer/.joe/ftyperc
+Finished processing /home/fryzjer/.joerc

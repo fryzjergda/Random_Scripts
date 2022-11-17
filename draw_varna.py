@@ -55,6 +55,7 @@ def read_file(input):
     sequence = ""
     structure = ""
     
+    print(lines)
     for i, line in enumerate(lines):
         if line[0] == ">":
             id = line.replace(">","")
@@ -111,7 +112,7 @@ def draw_varna(name, sequence, structure, reactivities, outfile):
     colormap = '0.0:#ffffff;0.001:#ffffcc;0.25:#fed976;0.5:#fd8d3c;0.75:#e31a1c;1:#800026'
 
     cmd = 'java -cp ' + VARNA_path + ' fr.orsay.lri.varna.applications.VARNAcmd -sequenceDBN ' + sequence + \
-            " -structureDBN '" + structure + "' -o " + outfile +"_"+algorithm+".png  -resolution 10.0 -title '" +name +"' -titleSize 10" + \
+            " -structureDBN '" + structure + "' -o " + outfile +"_"+algorithm+".png  -resolution 10.0 -title '" +name +"' -titleSize 2" + \
             " -algorithm "+algorithm+" -colorMapMin '0.0' -colorMapMax '1.0' -colorMapStyle '" + colormap + "' -colorMap '" + reactivities + "'" + \
             " -bpStyle simple"
 
@@ -121,15 +122,61 @@ def draw_varna(name, sequence, structure, reactivities, outfile):
     pass
 
 
+def check_infile(input):
+    
+    
+    with open(input) as file:
+        lines = file.readlines()
+        lines = [line.rstrip() for line in lines]
+
+
+    isok =True    
+    
+    if len(lines) == 1 and lines[0] !=1 :
+        lines.insert(0, ">RNA")
+        isok = False
+    
+
+    text = ""
+    
+    for i in range(len(lines)):
+        text += lines[i] + "\n"
+
+    text = text.rstrip()        
+    
+    temp_file = open("temp.fa", 'w')
+    temp_file.write(text)
+    temp_file.close()
+    
+    
+    return isok
+
+
 
 def predict_ss():
     
     
-    cmd = "RNAfold -p -d2 --noLP --noDP --noPS -T %s < %s" % (temperature, in_file)
+    isok = check_infile(in_file)
+    
+    if isok == True:    
+        input = in_file
+    else:
+        input = "temp.fa"
+
+    
+    cmd = "RNAfold -p -d2 --noLP --noDP --noPS -T %s < %s" % (temperature, input)
 
     print(cmd, "\n")
         
     ss = os.popen(cmd).read().splitlines()[2].split(' ')[0]  
+
+    
+    if isok == False:
+        cmd = "rm temp.fa"
+        os.popen(cmd)
+
+
+
 
     return ss
 
@@ -137,10 +184,22 @@ def predict_ss():
 
 def predict_ss_shape():
 
-    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=Dm%sb%s -T %s < %s" % (rfold_react,slope, intercept, temperature, in_file)
+    isok = check_infile(in_file)
+    
+    if isok == True:    
+        input = in_file
+    else:
+        input = "temp.fa"
+        
+    cmd = "RNAfold -p -d2 --noLP --noDP --noPS --shape=%s --shapeMethod=Dm%sb%s -T %s < %s" % (rfold_react,slope, intercept, temperature, input)
 
     print(cmd, "\n")
     ss = os.popen(cmd).read().splitlines()[2].split(' ')[0]  
+
+
+    if isok == False:
+        cmd = "rm temp.fa"
+        os.popen(cmd)
 
     return ss
 
@@ -166,6 +225,16 @@ def get_rfold_react():
     
     return rfold_react_file
 
+
+def write_out(id, seq, ss, outname):
+    
+    text = ">"+id + "\n" + seq + "\n" + ss 
+    
+    out_file = open(outname+"_DVout.db", "w")
+    out_file.write(text)
+    out_file.close()
+
+    print("Output file :" + outname+"_DVout.db\n")    
 
 
 def get_outname(outname):
@@ -233,5 +302,8 @@ if __name__ == '__main__':
         print("Predicted structure with SHAPE reactivities:\n" +ss+"\n")
         
     draw_varna(id, seq, ss, react_profile, outname)    
+
+
+    write_out(id, seq, ss, outname)
 
 
