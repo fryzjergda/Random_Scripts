@@ -228,7 +228,7 @@ def predict_ss_shape():
 
 def predict_ss_sk():
 
-    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -ph 10" 
+    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -ph 100 -sm " + str(slope) + " -si " + str(intercept)
     os.system(cmd)
 
     cmd = "ct2dot tmp.ct 1 tmp.sk" 
@@ -247,7 +247,7 @@ def predict_ss_sk():
     
 def predict_ss_sk_shape():
 
-    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -ph 10 -sh " + rfold_react 
+    cmd = "ShapeKnots-smp " + in_file + " tmp.ct -ph 100 -sm " + str(slope) + " -si " + str(intercept) + " -sh " + rfold_react 
     os.system(cmd)
 
     cmd = "ct2dot tmp.ct 1 tmp.sk" 
