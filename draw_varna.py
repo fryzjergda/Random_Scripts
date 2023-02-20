@@ -29,6 +29,8 @@ def argument_parser():
                             help="Energy model to use with RNAfold [t = Turner 2004, a = Andronescu 2007]")
     parser.add_argument("-p", "--predictor", required=False, dest="predictor", default="rf", type=str, choices=['rf','sk'],
                             help="Prediction method [rf = RNAfold, sk = ShapeKnots]")
+    parser.add_argument("-c", "--cut", required=False, dest="cutter", default="", type=str,
+                            help="Cut your input to specified range e.g.20-80. [default = no cutting]")
 
 
 
@@ -45,8 +47,9 @@ def argument_parser():
     output = args.output
     param = args.param
     predictor = args.predictor
+    cutter = args.cutter
     
-    return input, react, alg, temperature, slope, intercept, output, param, predictor
+    return input, react, alg, temperature, slope, intercept, output, param, predictor, cutter
 
 
 def read_file(input):
@@ -321,9 +324,29 @@ def get_outname(outname):
     if param == "a":
         outname += "_AndronescuEM"
 
+    if cutter != "":
+        cut_range = cutter.split("-")
+        cut_from = cut_range[0]
+        cut_to = cut_range[1]
+        outname += "_cut"+cut_from+"-"+cut_to
+        
+        
     return outname
     
+def cut_inputs(sequence, structure, reactivities):
+
+    cut_range = cutter.split("-")
+    cut_from = int(cut_range[0])
+    cut_to = int(cut_range[1])
+
+    new_sequence = sequence[cut_from-1:cut_to]
+    new_structure = structure[cut_from-1:cut_to]
     
+    react_list = reactivities.split(";")
+    new_reactivities = ";".join(react_list[cut_from-1:cut_to])    
+    
+    return new_sequence, new_structure, new_reactivities
+
 
 if __name__ == '__main__':
 
@@ -333,7 +356,7 @@ if __name__ == '__main__':
     SCRIPT_path =os.path.abspath(__file__) 
     PARAM_path = SCRIPT_path.replace(".py", "_functions/")
     
-    in_file, react_file, algorithm, temperature, slope, intercept, outfile, param, predictor = argument_parser()
+    in_file, react_file, algorithm, temperature, slope, intercept, outfile, param, predictor, cutter = argument_parser()
 
     
     if param == "a":
@@ -351,6 +374,10 @@ if __name__ == '__main__':
         react_profile = read_reactivity(react_file)
 
 
+    if cutter != "":
+        seq, ss, react_profile = cut_inputs(seq, ss, react_profile)
+    
+    
 
     outname = get_outname(outfile)
 
