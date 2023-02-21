@@ -347,6 +347,19 @@ def cut_inputs(sequence, structure, reactivities):
     
     return new_sequence, new_structure, new_reactivities
 
+def generate_temp_cut_fasta(seq):
+
+
+
+    text = ">RNA\n"+seq
+
+    text = text.rstrip()
+
+    temp_file = open("temp_cut.fa", 'w')
+    temp_file.write(text)
+    temp_file.close()
+
+
 
 if __name__ == '__main__':
 
@@ -377,8 +390,9 @@ if __name__ == '__main__':
     if cutter != "":
         seq, ss, react_profile = cut_inputs(seq, ss, react_profile)
     
-    
-
+        generate_temp_cut_fasta(seq)
+        
+        
     outname = get_outname(outfile)
 
     with open(outname+'.log', 'w') as f:
@@ -405,6 +419,8 @@ if __name__ == '__main__':
     print("Outfile:\n" + outname+ "\n")
     print("Sequence:\n" +seq+"\n")
     
+    if cutter != "":
+        in_file = "temp_cut.fa"
     pred_used = ""
     if predictor == "sk":
         pred_used = " with Shapeknots"
@@ -445,3 +461,5 @@ if __name__ == '__main__':
         cmd = "rm and.param"
         os.system(cmd)
 
+    if cutter != "":
+        os.system("rm temp_cut.fa")
