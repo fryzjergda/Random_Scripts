@@ -106,8 +106,8 @@ def cut_inputs(reactivities):
     cut_to = int(cut_range[1])
 
     
-    react_list = reactivities.split(";")
-    new_reactivities = ";".join(react_list[cut_from-1:cut_to])    
+#    react_list = reactivities.split(";")
+    new_reactivities = ";".join(reactivities[cut_from-1:cut_to])    
     
     return new_reactivities
 
