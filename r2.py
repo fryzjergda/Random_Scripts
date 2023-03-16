@@ -21,7 +21,8 @@ def argument_parser():
                             help="File with reactivity profile.")
     parser.add_argument("-r2", "--reactivity2", required=False, dest="react2",
                             help="File with reactivity profile.")
-
+    parser.add_argument("-c", "--cut", required=False, dest="cutter", default="", type=str,
+                            help="Cut your input to specified range e.g.20-80. [default = no cutting]")
 
 
 
@@ -30,7 +31,9 @@ def argument_parser():
     react1 = args.react1
     react2 = args.react2
 
-    return react1, react2
+    cutter = args.cutter
+
+    return react1, react2, cutter
 
 
 def calc_r2(y_test, y_predicted, outname):
@@ -96,17 +99,33 @@ def read_reactivity(in_react):
 
 
 
+def cut_inputs(reactivities):
+
+    cut_range = cutter.split("-")
+    cut_from = int(cut_range[0])
+    cut_to = int(cut_range[1])
+
+    
+    react_list = reactivities.split(";")
+    new_reactivities = ";".join(react_list[cut_from-1:cut_to])    
+    
+    return new_reactivities
+
+
 
 if __name__ == '__main__':
 
 
 
-    r_file1, r_file2 = argument_parser()
+    r_file1, r_file2, cutter = argument_parser()
     
     react_prof1 = read_reactivity(r_file1)
     react_prof2 = read_reactivity(r_file2)
     outname = r_file1.split(".")[0]
     
+    if cutter != "":
+        react_prof1 = cut_inputs(react_prof1)
+        react_prof2 = cut_inputs(react_prof2)
     
     print(react_prof1)
     print(react_prof2)
