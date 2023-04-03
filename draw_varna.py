@@ -4,6 +4,11 @@
 import argparse
 import os
 import sys
+import pandas as pd
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 
 import draw_varna_functions.RFparam as RFparam
 
@@ -361,6 +366,80 @@ def generate_temp_cut_fasta(seq):
 
 
 
+def draw_heatmap(seq, react):
+
+
+    result_heatmap = outname + '_heatmap.png'
+
+    vmin = 0.0
+
+    react_l = react.split(";")
+    react_l = [float(i) for i in react_l]
+    
+    
+    sns.set(font_scale=1)  # ticks font size
+
+    if len(seq) > 600:
+        size_fig_x = len(seq)*0.3
+    elif len(seq) > 300:
+        size_fig_x = len(seq)*0.6
+    else:
+        size_fig_x = len(seq)*1.2
+
+    fig, ax = plt.subplots(figsize=(size_fig_x, 5))
+
+    seq_split = list(seq)
+
+
+    seqnum = []
+
+    color_cmap = 'YlOrRd'
+
+    beg = 1
+    end = 8
+    
+    c=0
+    for i in seq_split:
+        c+=1
+        if c == 0:
+            c=1
+        seqnum.append(str(c) + '\n' + i)
+     
+    df2 = pd.DataFrame(react_l, columns=['ave2'])    
+#    df4 =[['2', '3', '4', '5','2', '3', '4', '5']] 
+    df4 = df2[["ave2"]].copy()
+    df4 = df4.transpose()
+
+#    print(df4)
+
+    ax = sns.heatmap(df4, annot= False, cbar=True, xticklabels=seqnum, \
+                     square=True, linewidths=1, linecolor= 'black', cmap=color_cmap, vmin=vmin, vmax=1.0)  # xticklabels=kok, takes labels from list
+
+
+    if len(seq) > 600:
+        xfontsize = 2
+    elif len(seq) > 300:
+        xfontsize = 12
+    else:
+        xfontsize = 25
+
+    ax = sns.heatmap(df4.mask(df4 >= 0), cmap='Greys',xticklabels=seqnum, vmin=-999.0, vmax=-1.01, cbar=False,square=True, linewidths=2, linecolor= 'black')
+
+    cbar = ax.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=xfontsize)
+    plt.tight_layout(h_pad=0.1)
+    plt.xticks(size=xfontsize, fontweight="bold")
+    plt.yticks(size=xfontsize, fontweight="bold")
+    ax.set(yticklabels=[])
+    plt.savefig(result_heatmap,bbox_inches='tight')
+    plt.clf()
+    plt.close()
+
+    pass
+
+
+
+
 if __name__ == '__main__':
 
     VARNA_path = '~/Apps/VARNAv3-93.jar'
@@ -378,7 +457,6 @@ if __name__ == '__main__':
 
     id, seq, ss = read_file(in_file)
     
-        
 
     react_profile = ""
 
@@ -395,18 +473,11 @@ if __name__ == '__main__':
         
     outname = get_outname(outfile)
 
+
     with open(outname+'.log', 'w') as f:
         f.write("draw_varna.py "+'\n'.join(sys.argv[1:]).replace('\n',' ')+"\n")
         
 
-    
-    
-#    react_profile = ""
-    
-#    if react_file:
-    
-#        react_profile = read_reactivity(react_file)
-    
     
     if react_profile != "":
         rfold_react = get_rfold_react()
@@ -456,6 +527,10 @@ if __name__ == '__main__':
 
 
     write_out(id, seq, ss, outname)
+
+    draw_heatmap(seq, react_profile)
+
+
     
     if param == "a":
         cmd = "rm and.param"
