@@ -96,11 +96,11 @@ def read_reactivity(in_react):
     reactivities = ""
     
     if len(lines) == 1:
-        reactivities = lines[0].replace("\t",";").replace(" ",";").replace(":",";").replace("NaN","-1.0").replace("-999","-1.0").replace(",",".")
+        reactivities = lines[0].replace("\t",";").replace(" ",";").replace(":",";").replace("NaN","-1.0").replace("-999.0","-1.0").replace("-999","-1.0").replace(",",".")
 
     elif len(lines) > 1 and "xml" not in lines[0]:
         for i in range(len(lines)):
-            reac_val = lines[i].replace(" ",";").replace("\t",";").replace("NaN","-1.0").replace("-999","-1.0").replace(",",".").split(";")
+            reac_val = lines[i].replace(" ",";").replace("\t",";").replace("NaN","-1.0").replace("-999.0","-1.0").replace("-999","-1.0").replace(",",".").split(";")
             if len(reac_val) > 1:
                 reac_val = reac_val[1]
             elif len(reac_val) == 1:
@@ -395,8 +395,6 @@ def draw_heatmap(seq, react):
 
     color_cmap = 'YlOrRd'
 
-    beg = 1
-    end = 8
     
     c=0
     for i in seq_split:
