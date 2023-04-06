@@ -153,7 +153,7 @@ if __name__ == '__main__':
     
     react_prof1 = read_reactivity(r_file1)
     react_prof2 = read_reactivity(r_file2)
-    outname = r_file1.split(".")[0]
+    outname = r_file1
     
     if cutter != "":
         react_prof1 = cut_inputs(react_prof1)

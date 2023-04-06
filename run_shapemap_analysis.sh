@@ -48,6 +48,9 @@ draw_varna.py -i ../$fasta -r ./rf_norm/*xml -sl 1.0 -in -0.4 -o $name"_RF" -c $
 
 mkdir $name"_RF_results"
 
+cp *.db ../.
+cp *.shape ../.
+
 mv *.png  $name"_RF_results"/.
 mv *.db  $name"_RF_results"/.
 mv *.shape  $name"_RF_results"/.
@@ -64,21 +67,34 @@ cd ../
 mkdir $name"_SM"
 cd $name"_SM"
 
-shapemapper --overwrite --name $name"_SM" --target ../$fasta --out $name"_SM" --amplicon --modified --R1 ../$r1t --R2 ../$r2t --untreated --R1 ../$r1u --R2 ../$r2u
-
-#draweing outputs
-draw_varna.py -i ../$fasta -r ./$name"_SM"/$name"_SM"*.shape -sl 1.0 -in -0.4 -o $name"_SM"
-
-draw_varna.py -i ../$fasta -r ./$name"_SM"/$name"_SM"*.shape -sl 1.0 -in -0.4 -o $name"_SM" -c $cut
-
 mkdir $name"_SM_results"
 
-mv *.png  $name"_SM_results"/.
-mv *.db  $name"_SM_results"/.
-mv *.shape  $name"_SM_results"/.
+
+shapemapper --overwrite --name $name"_SM" --target ../$fasta --out $name"_SM" --amplicon --modified --R1 ../$r1t --R2 ../$r2t --untreated --R1 ../$r1u --R2 ../$r2u
+
+cd $name"_SM"
+Superfold.py *map --SHAPEslope 1.0 --SHAPEintercept -0.4
+
+ct2dot results*/*.ct 1 $name"_SM".db
+draw_varna.py -i $name"_SM".db -r $name"_SM"*.shape -sl 1.0 -in -0.4 -o $name"_SM"
+cp $name"_SM"*"RNAfold"*.shape ../../.
+mv $name"_SM"*"RNAfold"*.shape ../$name"_SM_results"/.
+draw_varna.py -i $name"_SM".db -r $name"_SM"*.shape -sl 1.0 -in -0.4 -o $name"_SM" -c $cut
+cp $name"_SM"*"RNAfold"*.shape ../../.
+mv $name"_SM"*"RNAfold"*.shape ../$name"_SM_results"/.
+
+rm *.log
+
+cp *.db ../../.
+
+cp results*/*.pdf ../$name"_SM_results"/.
+mv *.db ../$name"_SM_results"/.
+mv *.png ../$name"_SM_results"/.
+
+cd ../
+
 
 cp ./$name"_SM"/*pdf $name"_SM_results"/.
 
-rm *.log
 
 
