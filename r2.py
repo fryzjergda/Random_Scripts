@@ -10,6 +10,8 @@ from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 import numpy as np
+from scipy.stats.stats import pearsonr 
+from math import log
 
 
 def argument_parser():
@@ -24,6 +26,8 @@ def argument_parser():
                             help="File with reactivity profile.")
     parser.add_argument("-c", "--cut", required=False, dest="cutter", default="", type=str,
                             help="Cut your input to specified range e.g.20-80. [default = no cutting]")
+    parser.add_argument("-n", "--normalize", required=False, dest="norm", default='off', choices=['off','on'],
+                            help="TBA")                            
 
 
 
@@ -33,28 +37,40 @@ def argument_parser():
     react2 = args.react2
 
     cutter = args.cutter
+    norm = args.norm
 
-    return react1, react2, cutter
+    return react1, react2, cutter, norm
 
 
 def calc_r2(y_test, y_predicted, outname):
 
-    r2 =  r2_score(y_test, y_predicted)
+#    r2 =  r2_score(y_test, y_predicted)
 #    print(r2)
     
     
+#    p = pearsonr(y_test, y_predicted)[0]
+#    print(p**2,"p")
+    
+    r2 = (pearsonr(y_test, y_predicted)[0])**2
     
     fig, ax = plt.subplots()
     ax.scatter(y_test, y_predicted)
 #    ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4)
     ax.set_xlabel(r_file1)
     ax.set_ylabel(r_file2)
+    ax.set_aspect('equal', adjustable='box')
     #regression line
 #    y_test, y_predicted = y_test.reshape(-1,1), y_predicted.reshape(-1,1)
 #    ax.annotate("r-squared = {:.3f}".format(r2_score(y_test, y_predicted)), (0, 1))
+    plt.xlim([0, 2.5])
+    plt.ylim([0, 2.5])
     ax.plot([y_test], LinearRegression().fit([y_test], [y_predicted]).predict([y_test]))
-    rsq = "r-squared = {:.3f}".format(r2_score(y_test, y_predicted))
+#    rsq = "r-squared = {:.3f}".format(r2_score(y_test, y_predicted))
+    rsq = "r-squared = "+str(round(r2,3))
+
     print(rsq)
+#    print(r2,"r2")
+#    print(r2_new,"r2_new")
     plt.title(rsq)
     
     plt.savefig(outname+'_R2.png')
@@ -145,11 +161,42 @@ def remove_outliers(r1, r2):
     return r1, r2
     
 
+def normalize_reactivities_(react_prof):
+
+    print(react_prof)
+    
+    norm_param = sum(react_prof)/len(react_prof)
+    print(sum(react_prof), "sum(react)")
+    
+    print(norm_param)
+    sum_l = 0
+    
+    for i in range(len(react_prof)):
+        sum_l += react_prof[i]
+    
+    print(sum_l, "sum_lA")
+    
+    react_prof_new = [i / norm_param for i in react_prof]
+    
+    return react_prof_new
+
+
+def normalize_reactivities(react_prof):
+    
+    print(react_prof)
+    for i in range(len(react_prof)):
+        #if react_prof[i] != 0:
+            react_prof[i] = log(react_prof[i]+1)
+    
+    print(react_prof)
+
+    return(react_prof)
+
 if __name__ == '__main__':
 
 
 
-    r_file1, r_file2, cutter = argument_parser()
+    r_file1, r_file2, cutter, norm = argument_parser()
     
     react_prof1 = read_reactivity(r_file1)
     react_prof2 = read_reactivity(r_file2)
@@ -163,6 +210,11 @@ if __name__ == '__main__':
 #    print(react_prof2)
     
     react_prof1, react_prof2 = remove_outliers(react_prof1, react_prof2)
+    
+    if norm == "on":
+        react_prof1 = normalize_reactivities(react_prof1)
+        react_prof2 = normalize_reactivities(react_prof2)
+    
 #    print(react_prof1)
 #    print(react_prof2)
     

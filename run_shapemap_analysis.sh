@@ -9,20 +9,38 @@ mask=$6
 name=$7
 cut=$8
 
+dos2unix $fasta
+dos2unix $mask
+
 mkdir $name"_RF"
 cd $name"_RF"
 
 #running RNAFramework
 
+echo bowtie2-build ../$fasta "reference_"$name
+
 bowtie2-build ../$fasta "reference_"$name
+
+echo rf-map -p 10 -b2 -cl 15 -b5 5 -ow -bi "reference_"$name ../$r1t ../$r2t ../$r1u ../$r2u 
 
 rf-map -p 10 -b2 -cl 15 -b5 5 -ow -bi "reference_"$name ../$r1t ../$r2t ../$r1u ../$r2u
 
+echo rf-count -p 10 -r -ow -f ../$fasta -m rf_map/*.bam -mf ../$mask
 rf-count -p 10 -r -ow -f ../$fasta -m rf_map/*.bam -mf ../$mask
 
-rf-rctools merge rf_count/*NT*_L001_R1_001.rc rf_count/*NT*_L001_R2_001.rc -o "untreated_"$name
+r1tc="${r1t//.fastq.gz/.rc}"
+r2tc="${r2t//.fastq.gz/.rc}"
+r1uc="${r1u//.fastq.gz/.rc}"
+r2uc="${r2u//.fastq.gz/.rc}"
 
-rf-rctools merge rf_count/*2A3*_L001_R1_001.rc rf_count/*2A3*_L001_R2_001.rc -o "treated_"$name
+
+echo rf-rctools merge rf_count/$r1uc rf_count/$r2uc -o "untreated_"$name -ow
+rf-rctools merge rf_count/$r1uc rf_count/$r2uc -o "untreated_"$name -ow
+
+echo rf-rctools merge rf_count/$r1tc rf_count/$r2tc -o "treated_"$name -ow
+rf-rctools merge rf_count/$r1tc rf_count/$r2tc -o "treated_"$name -ow
+
+echo rf-norm -sm 3 -nm 3 -ow -o rf_norm -i rf_count/index.rci -t treated_$name.rc -u "untreated_"$name.rc
 
 rf-norm -sm 3 -nm 3 -ow -o rf_norm -i rf_count/index.rci -t treated_$name.rc -u "untreated_"$name.rc
 
