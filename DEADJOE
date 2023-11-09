@@ -221,3 +221,49 @@ Finished processing /home/fryzjer/.joerc
 
 *** These modified files were found in JOE when it aborted on Mon Apr 24 15:27:25 2023
 *** JOE was aborted because the terminal closed
+
+*** These modified files were found in JOE when it aborted on Thu Nov  9 17:43:16 2023
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+Epf
+1-MCC
+sln_Epf
+standard_group
+advanced_group
+max_size
+min_size
+P
+"_lc"+str(constant_cut)+"_predicted.fa")
+sys.exit()
+
+*** File '(Unnamed)'
+np.
+pd.
+pd
+matplot
+path
+PATH
+test_predictors
+test_predictors
+read_config
+test_predictors
+
+*** File '(Unnamed)'
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+/home/fryzjer/Projects/tests/rnafold_entropy/get_entropies_from_RNAfold.py
+get_entropies_from_RNAfold_RF.py
+/home/fryzjer/Projects/Random_Scripts/run_shapemap_analysis.sh
+
+*** File '* Startup Log *'
+Processing '/home/fryzjer/.joerc'...
+Processing '/home/fryzjer/.joe/ftyperc'...
+Finished processing /home/fryzjer/.joe/ftyperc
+Finished processing /home/fryzjer/.joerc
