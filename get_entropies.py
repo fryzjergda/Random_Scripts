@@ -89,7 +89,7 @@ def _calculate_entropies(probabilities, sequence_length):
 
 
 # Function to plot the entropies with a filled style
-def _plot_entropies(entropies):
+def plot_entropies_bar(entropies, filename):
     plt.figure(figsize=(10, 5))
     plt.fill_between(range(1, len(entropies) + 1), entropies, color='brown', step='mid', alpha=0.5)
     plt.title('Entropy Plot')
@@ -98,8 +98,8 @@ def _plot_entropies(entropies):
     plt.ylim(0, max(entropies) * 1.1)  # Set y-axis limit to give some space above the highest peak
     plt.grid(True)  # Optional: Adds a grid to the plot
     plt.gca().set_facecolor('white')  # Set background to white
-    plt.show()
-
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    plt.close()
 
 
 
@@ -156,3 +156,4 @@ if __name__ == "__main__":
     plot_entropies(entropies, 'entropy_plot.png')
     smoothed_entropies = calculate_smoothed_entropies(probabilities, sequence_length, window_size)
     plot_entropies(smoothed_entropies, 'entropy_smoothed_plot.png')
+    plot_entropies_bar(entropies, 'entropy_plot_bar.png')
