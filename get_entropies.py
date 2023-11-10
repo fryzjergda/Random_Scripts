@@ -44,7 +44,7 @@ def calculate_smoothed_entropies(probabilities, sequence_length, window_size):
 
 
 
-def calculate_entropies(probabilities, sequence_length):
+def _calculate_entropies(probabilities, sequence_length):
     entropies = np.zeros(sequence_length)
     # Calculate the total entropy
     total_entropy = -np.sum([p * np.log10(p) for (_, _), p in probabilities.items()])
@@ -58,7 +58,7 @@ def calculate_entropies(probabilities, sequence_length):
 
 # Function to calculate the entropy for each base position including unpaired probabilities
 # RNAfold webserver style
-def _calculate_entropies(probabilities, sequence_length):
+def calculate_entropies(probabilities, sequence_length):
     entropies = np.zeros(sequence_length)
     for i in range(1, sequence_length + 1):
         p_i = [prob for (base_i, base_j), prob in probabilities.items() if base_i == i or base_j == i]
