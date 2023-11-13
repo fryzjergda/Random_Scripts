@@ -4,6 +4,7 @@
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 
 # Function to parse the dp.ps file and return the square roots of the probabilities
 def parse_dp_ps(file_path):
@@ -142,6 +143,31 @@ def get_sequence_length(fas_file_path):
         sequence = file.readline().strip()
         return len(sequence)
 
+def get_sequence(fas_file_path):
+    with open(fas_file_path, 'r') as file:
+        # Skip the first line which is the header
+        file.readline()
+        # The second line is the sequence
+        sequence = file.readline().strip()
+        return sequence
+
+
+def write_entropies_to_csv(entropies, sequence, filename):
+    # Create a list of dictionaries, each representing a row in the CSV
+    data = [
+        {"Nucleotide Number": i, "Nucleotide Letter": sequence[i-1], "Entropy Value": entropies[i-1]}
+        for i in range(1, len(sequence) + 1)
+    ]
+
+    # Define the field names for the CSV
+    fieldnames = ["Nucleotide Number", "Nucleotide Letter", "Entropy Value"]
+
+    # Write the data to the CSV file
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')  # Use '\t' for TSV
+        writer.writeheader()  # Write the header row
+        writer.writerows(data)  # Write the data rows
+
 # Main script execution
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Calculate and plot entropies from a dp.ps file.")
@@ -150,10 +176,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    sequence_length = get_sequence_length(args.fas_file)
+    sequence = get_sequence(args.fas_file)
+    sequence_length = len(sequence)    
+    
     probabilities = parse_dp_ps(args.ps_file)
     entropies = calculate_entropies(probabilities, sequence_length)
     plot_entropies(entropies, 'entropy_plot.png')
     smoothed_entropies = calculate_smoothed_entropies(probabilities, sequence_length, window_size)
     plot_entropies(smoothed_entropies, 'entropy_smoothed_plot.png')
     plot_entropies_bar(entropies, 'entropy_plot_bar.png')
+    write_entropies_to_csv(entropies, sequence, 'entopies.csv')
